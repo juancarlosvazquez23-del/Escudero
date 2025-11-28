@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Biblioteca - Admin & Alumno</title>
+    <link href="styles.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="app.js" defer></script>
+</head>
+
+<body>
+    <div class="app">
+        <header>
+            <div class="brand">
+                <div class="logo">B</div>
+                <div>
+                    <div class="title">Biblioteca - Panel</div>
+                    <div class="subtitle">Admin & Alumno — Demo local (localStorage)</div>
+                </div>
+            </div>
+
+            <nav id="nav" class="dropdown-nav">
+                <button id="nav-toggle" class="nav-toggle">
+                    <span id="nav-current">Inicio</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div id="nav-menu" class="nav-menu hidden">
+                    <button id="tab-home" class="nav-menu-item active">Inicio</button>
+                    <!-- Admin eliminado -->
+                    <button id="tab-alumno" class="nav-menu-item">Alumno</button>
+                </div>
+            </nav>
+        </header>
+
+        <div class="grid">
+            <aside>
+                <div class="card">
+                    <h3>Accesos rápidos</h3>
+                    <div class="col">
+                        <button id="open-admin" class="btn">Ir a Admin (login)</button>
+                        <button id="open-alumno" class="btn ghost">Ir a Alumno</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>Estadísticas rápidas</h4>
+                    <p>Libros totales: <span id="stat-books">0</span></p>
+                    <p>Noticias: <span id="stat-news">0</span></p>
+                    <p>Asistencias: <span id="stat-att">0</span></p>
+                    <p>Solicitudes: <span id="stat-req">0</span></p>
+                </div>
+            </aside>
+
+            <main id="content">
+                <!-- HOME -->
+                <section id="home-section" class="page">
+                    <div class="card">
+                        <h2>Bienvenido</h2>
+                        <p>Panel de administración y espacio para alumnos. Usa las pestañas para navegar.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Últimas noticias</h3>
+                        <div id="news-list-home"></div>
+                    </div>
+                </section>
+
+                <!-- ADMIN -->
+                <section id="admin-section" class="page hidden">
+                    <!-- Login -->
+                    <div id="admin-login-card" class="card">
+                        <h2>Login administrador</h2>
+                        <form id="admin-login">
+                            <label>Usuario</label>
+                            <input type="text" id="admin-user" value="admin">
+                            <label>Contraseña</label>
+                            <input type="password" id="admin-pass">
+                            <div class="row">
+                                <button class="btn" type="submit">Entrar</button>
+                                <button type="button" id="back-home" class="btn ghost">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Panel admin (oculto hasta login) -->
+                    <div id="admin-panel" class="hidden">
+                        <div class="card">
+                            <h2>Panel Admin</h2>
+                            <div class="row">
+                                <button id="show-library" class="btn">Biblioteca</button>
+                                <button id="show-news" class="btn ghost">Noticias</button>
+                                <button id="show-attendance" class="btn ghost">Asistencias</button>
+                                <button id="show-search" class="btn ghost">Buscadores</button>
+                                <button id="show-stats" class="btn ghost">Gráficas</button>
+                                <div style="margin-left:auto">Sesión: <span class="badge">admin</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Resto del admin idéntico -->
+                        <div id="admin-library" class="card hidden">
+                            <h3>Biblioteca - Gestión de libros</h3>
+                            <form id="book-form">
+                                <label>Título</label><input id="b-title" type="text">
+                                <label>Autor</label><input id="b-author" type="text">
+                                <label>Carrera</label><input id="b-carrera" type="text">
+                                <label>Semestre</label><input id="b-semestre" type="text">
+                                <label>Género</label><input id="b-genero" type="text">
+                                <label>Descripción</label><textarea id="b-desc" rows="3"></textarea>
+                                <label>Archivo (PDF/epub) - opcional</label><input id="b-file" type="file"
+                                    accept="application/pdf,application/epub+zip">
+                                <input type="hidden" id="b-id">
+                                <div class="row">
+                                    <button id="save-book" type="button" class="btn">Guardar libro</button>
+                                    <button id="new-book" type="button" class="btn ghost">Nuevo</button>
+                                </div>
+                            </form>
+
+                            <hr />
+                            <label>Buscar libros</label>
+                            <input id="admin-search-book" placeholder="título/autor/carrera/género">
+                            <div class="table-scroll">
+                                <table id="books-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Título</th>
+                                            <th>Autor</th>
+                                            <th>Carrera</th>
+                                            <th>Semestre</th>
+                                            <th>Género</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Noticias CRUD -->
+                        <div id="admin-news" class="card hidden">
+                            <h3>Noticias - Gestión (Admin)</h3>
+                            <form id="news-form">
+                                <label>Título</label><input id="n-title" type="text">
+                                <label>Contenido</label><textarea id="n-body" rows="4"></textarea>
+                                <label>Imagen (opcional)</label><input id="n-img" type="file" accept="image/*">
+                                <input type="hidden" id="n-id">
+                                <div class="row">
+                                    <button id="save-news" type="button" class="btn">Guardar noticia</button>
+                                    <button id="new-news" type="button" class="btn ghost">Nuevo</button>
+                                </div>
+                            </form>
+
+                            <hr />
+                            <div class="table-scroll">
+                                <table id="news-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Título</th>
+                                            <th>Fecha</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Asistencias -->
+                        <div id="admin-attendance" class="card hidden">
+                            <h3>Asistencias - Gestión (Admin)</h3>
+                            <div class="row">
+                                <input id="filter-att-admin" placeholder="Buscar por nombre/carrera/actividad">
+                                <button id="export-csv" class="btn ghost small">Exportar CSV</button>
+                            </div>
+                            <div class="table-scroll">
+                                <table id="att-table-admin">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Carrera</th>
+                                            <th>Semestre</th>
+                                            <th>Género</th>
+                                            <th>Actividad</th>
+                                            <th>Fecha</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Buscadores -->
+                        <div id="admin-search" class="card hidden">
+                            <h3>Buscadores</h3>
+                            <label>Buscar alumnos</label><input id="search-students" placeholder="nombre/matrícula">
+                            <div class="table-scroll">
+                                <table id="students-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Carrera</th>
+                                            <th>Semestre</th>
+                                            <th>Género</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                            <hr />
+                            <label>Buscar libros</label><input id="search-books-admin" placeholder="Buscar libros...">
+                            <div class="table-scroll">
+                                <table id="books-table-admin">
+                                    <thead>
+                                        <tr>
+                                            <th>Título</th>
+                                            <th>Autor</th>
+                                            <th>Disponible</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Gráficas -->
+                        <div id="admin-stats" class="card hidden">
+                            <h3>Gráficas</h3>
+                            <p>Selecciona la gráfica (cada una abre su propia página dentro del panel)</p>
+                            <div class="row">
+                                <button id="open-chart-carrera" class="btn">Carrera</button>
+                                <button id="open-chart-semestre" class="btn ghost">Semestre</button>
+                                <button id="open-chart-genero" class="btn ghost">Género</button>
+                            </div>
+                        </div>
+
+                        <!-- Páginas gráficas -->
+                        <div id="chart-carrera" class="card hidden page-sub">
+                            <h3>Gráfica: Carrera</h3>
+                            <canvas id="chart-carrera-canvas"></canvas>
+                            <div class="row"><button id="back-stats-from-carrera" class="btn ghost">Volver a
+                                    Gráficas</button></div>
+                        </div>
+
+                        <div id="chart-semestre" class="card hidden page-sub">
+                            <h3>Gráfica: Semestre</h3>
+                            <canvas id="chart-semestre-canvas"></canvas>
+                            <div class="row"><button id="back-stats-from-semestre" class="btn ghost">Volver a
+                                    Gráficas</button></div>
+                        </div>
+
+                        <div id="chart-genero" class="card hidden page-sub">
+                            <h3>Gráfica: Género</h3>
+                            <canvas id="chart-genero-canvas"></canvas>
+                            <div class="row"><button id="back-stats-from-genero" class="btn ghost">Volver a
+                                    Gráficas</button></div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ALUMNO -->
+                <section id="alumno-section" class="page hidden">
+                    <div class="card">
+                        <h2>Registro de asistencia (Alumno)</h2>
+                        <form id="asistencia-form">
+                            <label>Nombres</label><input id="a-nombres" required>
+                            <label>Apellidos</label><input id="a-apellidos" required>
+                            <label>Matrícula / ID (opcional)</label><input id="a-id">
+                            <label>Carrera</label>
+                            <select id="a-carrera" required>
+                                <option value="">Selecciona una carrera</option>
+                                <option value="Programacion">Programacion</option>
+                                <option value="Mecatronica">Mecatronica</option>
+                                <option value="Trabajo Social">Trabajo Social</option>
+                                <option value="Administracion">Administracion</option>
+                                <option value="Arquitectura">Arquitectura</option>
+                                <option value="Electricidad">Electricidad</option>
+                                <option value="Ciberseguridad">Ciberseguridad</option>
+                                <option value="CAED">CAED</option>
+                            </select>
+                            <label>Semestre</label>
+                            <select id="a-semestre" required>
+                                <option value="">Selecciona un semestre</option>
+                                <option value="1ro">1ro</option>
+                                <option value="2do">2do</option>
+                                <option value="3ro">3ro</option>
+                                <option value="4to">4to</option>
+                                <option value="5to">5to</option>
+                                <option value="6to">6to</option>
+                            </select>
+                            <label>Género</label>
+                            <select id="a-genero">
+                                <option value="">Selecciona una opción</option>
+                                <option value="F">F</option>
+                                <option value="M">M</option>
+                            </select>
+                            <label>Actividad a realizar</label>
+                            <select id="a-actividad" required>
+                                <option value="">Selecciona una actividad</option>
+                                <option value="Tarea">Tarea</option>
+                                <option value="Lectura">Lectura</option>
+                                <option value="Prestamo">Prestamo</option>
+                                <option value="Ajedrez">Ajedrez</option>
+                            </select>
+                            <div class="row">
+                                <button id="save-att" class="btn">Registrar asistencia</button>
+                                <button id="clear-att" class="btn ghost">Limpiar</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <h3>Listado de asistencias</h3>
+                        <input id="filter-att" placeholder="Buscar por nombre/carrera/actividad">
+                        <div class="table-scroll">
+                            <table id="att-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Carrera</th>
+                                        <th>Semestre</th>
+                                        <th>Género</th>
+                                        <th>Actividad</th>
+                                        <th>Fecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Ranking — Participación</h3>
+                        <div id="ranking-list"></div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Buscar libros</h3>
+                        <input id="search-books" placeholder="Buscar libros por título/autor/carrera/género">
+                        <div id="books-results" class="table-scroll"></div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Solicitar / Devolver libros</h3>
+                        <p>Al solicitar, el libro se marca como no disponible hasta que se devuelva.</p>
+                        <div id="student-requests"></div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+</body>
+
+</html>
