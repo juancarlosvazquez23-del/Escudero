@@ -991,3 +991,14 @@ async function init() {
 }
 
 init();
+const adminTabs = document.querySelectorAll(".btn.ghost");
+
+adminTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+        // Quitar selección a todos
+        adminTabs.forEach(t => t.classList.remove("active-tab"));
+
+        // Activar el clickeado
+        tab.classList.add("active-tab");
+    });
+});
