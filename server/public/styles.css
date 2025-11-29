@@ -258,3 +258,12 @@ td {
     background: #000 !important;
     color: #fff !important;
 }
+
+.logo img {
+    width: 50px;
+    /* tamaño del logo */
+    height: 50px;
+    object-fit: contain;
+    border-radius: 8px;
+    /* si quieres esquinas redondeadas */
+}
