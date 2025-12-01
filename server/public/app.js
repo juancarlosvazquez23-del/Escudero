@@ -625,12 +625,38 @@ function renderStudentsTable() {
         if (seen[key]) return;
         seen[key] = true;
 
+        // Calcular solicitudes de libros para este alumno
+        const studentName = (s.nombres + ' ' + s.apellidos).trim();
+        const allRequests = load(DB.reqKey);
+        const books = load(DB.booksKey);
+
+        // Filtrar solicitudes por nombre del alumno
+        const studentRequests = allRequests.filter(req =>
+            req.requesterName && req.requesterName.toLowerCase().trim() === studentName.toLowerCase()
+        );
+
+        // Obtener títulos de los libros solicitados
+        const bookTitles = studentRequests.map(req => {
+            const book = books.find(b => b.id === req.bookId);
+            return book ? book.title : 'Libro desconocido';
+        });
+
+        // Crear contenido de la celda de solicitudes
+        let requestsContent = '';
+        if (studentRequests.length === 0) {
+            requestsContent = '<span class="muted">Sin solicitudes</span>';
+        } else {
+            requestsContent = `<strong>${studentRequests.length} solicitud(es):</strong><br>`;
+            requestsContent += bookTitles.map(title => `• ${escapeHtml(title)}`).join('<br>');
+        }
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${escapeHtml(s.nombres + ' ' + s.apellidos)}</td>
             <td>${escapeHtml(s.carrera)}</td>
             <td>${escapeHtml(s.semestre)}</td>
-            <td>${escapeHtml(s.genero)}</td>`;
+            <td>${escapeHtml(s.genero)}</td>
+            <td style="font-size: 0.9em;">${requestsContent}</td>`;
         tbody.appendChild(tr);
     });
 
