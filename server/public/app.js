@@ -130,23 +130,13 @@ async function loadAllFromApi() {
 
 function seedDemo() {
     if (!load(DB.booksKey).length) {
-        save(DB.booksKey, [
-            { id: uid(), title: 'Biología del Desarrollo', author: 'A. Morales', carrera: 'Medicina', semestre: '6', genero: 'Ciencias', desc: 'Texto base', available: true },
-            { id: uid(), title: 'Anatomía Humana', author: 'J. Pérez', carrera: 'Enfermería', semestre: '4', genero: 'Medicina', desc: 'Atlas básico', available: true },
-            { id: uid(), title: 'Histología Básica', author: 'R. López', carrera: 'Medicina', semestre: '5', genero: 'Ciencias', desc: 'Figuras y tablas', available: true }
-        ]);
+        save(DB.booksKey, []);
     }
     if (!load(DB.newsKey).length) {
-        save(DB.newsKey, [
-            { id: uid(), title: 'Inicio de semestre', body: 'Bienvenido al semestre', ts: new Date().toISOString() },
-            { id: uid(), title: 'Nuevos libros', body: 'Se añadieron 3 libros nuevos', ts: new Date().toISOString() }
-        ]);
+        save(DB.newsKey, []);
     }
     if (!load(DB.attKey).length) {
-        save(DB.attKey, [
-            { id: uid(), nombres: 'Ana', apellidos: 'Gómez', mat: 'A001', carrera: 'Medicina', semestre: '6', genero: 'F', actividad: 'Pregunta', ts: new Date().toISOString() },
-            { id: uid(), nombres: 'Luis', apellidos: 'Ruiz', mat: 'A002', carrera: 'Enfermería', semestre: '4', genero: 'M', actividad: 'Práctica', ts: new Date().toISOString() }
-        ]);
+        save(DB.attKey, []);
     }
     if (!load(DB.reqKey).length) save(DB.reqKey, []);
 }
